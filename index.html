@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#262428" />
+<title>KindoLux LLC — Curated Quality Goods</title>
+<meta name="description" content="KindoLux LLC — a US-registered (Wyoming) e-commerce business curating quality household and home products for US customers. Launching soon." />
+
+<!-- ============================ FONTS ============================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- ============================ FAVICON (inline brand mark) ============================ -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cpath d='M62 44H182L62 168V44Z' fill='%23262428'/%3E%3Cpath d='M110 194L110 122C129 122 147.4 129.6 160.9 143.1C174.4 156.6 182 174.9 182 194L110 194Z' fill='%23FF6B5E'/%3E%3C/svg%3E" />
+
+<style>
+/* ============================================================
+   BRAND TOKENS
+   ============================================================ */
+:root{
+  --graphite:#262428;
+  --coral:#FF6B5E;
+  --paper:#F8F5F4;
+
+  /* derived tones (kept tight to the palette) */
+  --ink-900:#1c1a1e;
+  --ink-800:#262428;
+  --ink-700:#322f35;
+  --muted:#9a949f;
+  --coral-soft:rgba(255,107,94,.16);
+  --line:rgba(248,245,244,.10);
+  --glass:rgba(248,245,244,.045);
+
+  --font-body:'Sora',system-ui,-apple-system,Segoe UI,sans-serif;
+  --font-head:'Fraunces',Georgia,serif;
+  --maxw:1120px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  color:var(--paper);
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #322f35 0%, #211f23 45%, var(--ink-900) 100%);
+  background-attachment:fixed;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img,svg{display:block}
+
+/* ============================================================
+   3D CANVAS  (fixed behind everything, non-blocking)
+   ============================================================ */
+#bg-canvas{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+  touch-action:none; /* allows drag-to-rotate gestures we read on window */
+}
+
+/* scroll progress bar */
+#progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--coral),#ffd0c9);
+  z-index:60;transition:width .1s linear;
+  box-shadow:0 0 14px rgba(255,107,94,.7);
+}
+
+/* custom cursor glow (desktop only) */
+#cursor{
+  position:fixed;top:0;left:0;width:26px;height:26px;border-radius:50%;
+  border:1px solid rgba(255,107,94,.55);
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:55;mix-blend-mode:screen;
+  transition:width .2s var(--ease),height .2s var(--ease),background .2s var(--ease);
+  display:none;
+}
+#cursor.hot{width:46px;height:46px;background:var(--coral-soft);border-color:var(--coral)}
+@media (hover:hover) and (pointer:fine){ #cursor{display:block} }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px clamp(18px,5vw,54px);
+  transition:background .4s var(--ease),backdrop-filter .4s var(--ease),padding .4s var(--ease);
+}
+nav.scrolled{
+  background:rgba(28,26,30,.6);
+  backdrop-filter:blur(14px) saturate(120%);
+  -webkit-backdrop-filter:blur(14px) saturate(120%);
+  border-bottom:1px solid var(--line);
+  padding-top:12px;padding-bottom:12px;
+}
+.brand{display:flex;align-items:center;gap:11px}
+.brand svg{width:30px;height:30px}
+.brand .wm{font-family:var(--font-head);font-size:1.32rem;font-weight:300;letter-spacing:.2px}
+.brand .wm b{font-weight:700;color:var(--coral)}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{
+  font-size:.82rem;font-weight:500;letter-spacing:.04em;color:var(--paper);
+  opacity:.78;position:relative;padding:4px 0;transition:opacity .25s var(--ease);
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:-2px;height:1.5px;width:0;
+  background:var(--coral);transition:width .3s var(--ease);
+}
+.nav-links a:hover{opacity:1}
+.nav-links a:hover::after{width:100%}
+.nav-cta{
+  padding:9px 18px;border:1px solid var(--coral);border-radius:40px;
+  color:var(--coral);font-weight:600;font-size:.8rem;opacity:1!important;
+  transition:background .25s var(--ease),color .25s var(--ease);
+}
+.nav-cta::after{display:none}
+.nav-cta:hover{background:var(--coral);color:var(--ink-900)}
+.menu-btn{display:none;background:none;border:0;color:var(--paper);cursor:pointer;padding:6px}
+.menu-btn svg{width:26px;height:26px}
+@media (max-width:760px){
+  .nav-links{
+    position:fixed;inset:0 0 0 auto;width:min(78vw,320px);
+    flex-direction:column;justify-content:center;gap:26px;
+    background:rgba(28,26,30,.94);backdrop-filter:blur(18px);
+    transform:translateX(100%);transition:transform .45s var(--ease);
+    padding:40px;border-left:1px solid var(--line);
+  }
+  .nav-links.open{transform:translateX(0)}
+  .nav-links a{font-size:1.05rem}
+  .menu-btn{display:block;z-index:51}
+}
+
+/* ============================================================
+   LAYOUT / SECTIONS
+   ============================================================ */
+main{position:relative;z-index:1}
+section{
+  position:relative;
+  padding:clamp(90px,13vh,150px) clamp(20px,6vw,40px);
+}
+.wrap{max-width:var(--maxw);margin:0 auto;width:100%}
+.eyebrow{
+  font-size:.74rem;font-weight:600;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--coral);margin-bottom:18px;display:inline-flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--coral);opacity:.8}
+h2{
+  font-family:var(--font-head);font-weight:500;
+  font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:22px;
+}
+h2 em{font-style:italic;color:var(--coral)}
+.lead{font-size:clamp(1rem,1.6vw,1.18rem);color:rgba(248,245,244,.82);max-width:60ch;font-weight:300}
+
+.glass{
+  background:var(--glass);
+  border:1px solid var(--line);
+  border-radius:20px;
+  backdrop-filter:blur(12px) saturate(120%);
+  -webkit-backdrop-filter:blur(12px) saturate(120%);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+/* reveal-on-scroll */
+.reveal{opacity:0;transform:translateY(38px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}
+.reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero{
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;padding-top:140px;
+}
+.hero-tag{
+  font-size:.78rem;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:26px;font-weight:500;
+}
+.hero-wm{
+  font-family:var(--font-head);font-weight:300;
+  font-size:clamp(3.4rem,13vw,9rem);line-height:.92;letter-spacing:-.02em;
+}
+.hero-wm b{font-weight:700;color:var(--coral)}
+.hero-line{
+  margin-top:24px;font-size:clamp(1.05rem,2.4vw,1.5rem);font-weight:300;
+  color:rgba(248,245,244,.86);font-family:var(--font-head);font-style:italic;
+}
+.hero-actions{margin-top:42px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+  padding:14px 28px;border-radius:44px;font-weight:600;font-size:.92rem;
+  border:1px solid transparent;transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease);
+}
+.btn-primary{background:var(--coral);color:var(--ink-900);box-shadow:0 12px 34px rgba(255,107,94,.35)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(255,107,94,.5)}
+.btn-ghost{border-color:var(--line);color:var(--paper);background:rgba(248,245,244,.03)}
+.btn-ghost:hover{border-color:var(--paper);transform:translateY(-3px)}
+.scroll-hint{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.scroll-hint span{width:1px;height:42px;background:linear-gradient(var(--coral),transparent);animation:scrolldot 2s var(--ease) infinite}
+@keyframes scrolldot{0%{opacity:0;transform:scaleY(.2);transform-origin:top}50%{opacity:1}100%{opacity:0;transform:scaleY(1);transform-origin:top}}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+#about .wrap{max-width:760px}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.chip{
+  padding:9px 18px;border-radius:40px;font-size:.8rem;font-weight:500;letter-spacing:.02em;
+  border:1px solid var(--line);background:rgba(248,245,244,.04);color:rgba(248,245,244,.88);
+  display:flex;align-items:center;gap:9px;
+}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 10px var(--coral);font-style:normal}
+
+/* ============================================================
+   JOURNEY / TIMELINE
+   ============================================================ */
+#journey .wrap{max-width:760px}
+.timeline{position:relative;margin-top:50px;padding-left:8px}
+.timeline::before{
+  content:"";position:absolute;left:19px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(var(--coral),rgba(255,107,94,.12));
+  transform:scaleY(0);transform-origin:top;transition:transform 1.4s var(--ease);
+}
+.timeline.in::before{transform:scaleY(1)}
+.t-item{position:relative;padding:0 0 46px 64px;perspective:600px}
+.t-item:last-child{padding-bottom:0}
+.t-node{
+  position:absolute;left:0;top:2px;width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#3a373d,#211f23);
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  transform:rotateX(8deg) scale(.4);opacity:0;
+  transition:transform .7s var(--ease),opacity .7s var(--ease),box-shadow .7s var(--ease),border-color .7s var(--ease);
+}
+.t-item.in .t-node{transform:rotateX(8deg) scale(1);opacity:1}
+.t-node i{width:11px;height:11px;border-radius:50%;background:var(--muted);font-style:normal;transition:.5s var(--ease)}
+.t-item.done.in .t-node{border-color:var(--coral);box-shadow:0 0 0 4px var(--coral-soft),0 0 26px rgba(255,107,94,.5)}
+.t-item.done.in .t-node i{background:var(--coral);box-shadow:0 0 14px var(--coral)}
+.t-item.pending.in .t-node{border-color:var(--coral);animation:nodepulse 2.2s var(--ease) infinite}
+.t-item.pending.in .t-node i{background:var(--coral);animation:nodepulse 2.2s var(--ease) infinite}
+@keyframes nodepulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,94,.45),0 0 18px rgba(255,107,94,.4)}50%{box-shadow:0 0 0 9px rgba(255,107,94,0),0 0 30px rgba(255,107,94,.7)}}
+.t-h{font-family:var(--font-head);font-size:1.28rem;font-weight:500;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.t-badge{
+  font-family:var(--font-body);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  padding:4px 11px;border-radius:30px;font-weight:600;
+}
+.badge-done{background:var(--coral-soft);color:var(--coral);border:1px solid rgba(255,107,94,.3)}
+.badge-soon{background:var(--coral);color:var(--ink-900)}
+.t-desc{color:rgba(248,245,244,.7);margin-top:8px;font-weight:300;font-size:.98rem}
+
+/* ============================================================
+   COMING SOON / SIGNUP
+   ============================================================ */
+#soon{text-align:center}
+#soon .wrap{max-width:660px}
+.signup{margin-top:40px;padding:38px clamp(22px,4vw,46px)}
+.signup form{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.signup input[type=email]{
+  flex:1;min-width:220px;padding:15px 20px;border-radius:44px;
+  background:rgba(248,245,244,.06);border:1px solid var(--line);
+  color:var(--paper);font-family:inherit;font-size:.95rem;outline:none;
+  transition:border-color .25s var(--ease),background .25s var(--ease);
+}
+.signup input::placeholder{color:var(--muted)}
+.signup input:focus{border-color:var(--coral);background:rgba(248,245,244,.09)}
+.signup .micro{font-size:.78rem;color:var(--muted);margin-top:18px}
+
+/* ============================================================
+   VAULT
+   ============================================================ */
+#vault .wrap{max-width:860px}
+.vault-card{padding:clamp(28px,4vw,46px);text-align:center}
+.lock-ico{
+  width:64px;height:64px;margin:0 auto 22px;border-radius:18px;display:grid;place-items:center;
+  background:var(--coral-soft);border:1px solid rgba(255,107,94,.3);
+}
+.lock-ico svg{width:30px;height:30px;stroke:var(--coral)}
+.vault-msg{margin-top:16px;font-size:.9rem;min-height:1.2em;font-weight:500}
+.vault-msg.err{color:#ff8d82}
+.vault-msg.ok{color:var(--coral)}
+.vault-table-wrap{margin-top:30px;overflow-x:auto;border-radius:16px;border:1px solid var(--line);
+  max-height:0;opacity:0;transition:max-height .7s var(--ease),opacity .6s var(--ease),margin .5s var(--ease)}
+.vault-table-wrap.show{max-height:520px;opacity:1}
+table{width:100%;border-collapse:collapse;text-align:left;min-width:560px}
+thead th{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:600;
+  padding:16px 20px;background:rgba(255,107,94,.06);border-bottom:1px solid var(--line);
+}
+tbody td{padding:18px 20px;border-bottom:1px solid rgba(248,245,244,.06);color:rgba(248,245,244,.62);font-weight:300;font-size:.92rem}
+tbody tr:last-child td{border-bottom:0}
+.empty-state td{text-align:center;color:var(--muted);font-style:italic;padding:34px}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  position:relative;z-index:1;text-align:center;
+  padding:70px clamp(20px,6vw,40px) 50px;border-top:1px solid var(--line);
+  background:rgba(28,26,30,.5);backdrop-filter:blur(10px);
+}
+.foot-brand{display:inline-flex;align-items:center;gap:11px;margin-bottom:18px}
+.foot-brand svg{width:30px;height:30px}
+.foot-brand .wm{font-family:var(--font-head);font-size:1.3rem;font-weight:300}
+.foot-brand .wm b{font-weight:700;color:var(--coral)}
+.foot-tag{font-family:var(--font-head);font-style:italic;color:rgba(248,245,244,.7);margin-bottom:22px}
+.foot-links{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;font-size:.9rem}
+.foot-links a{color:rgba(248,245,244,.78);transition:color .25s var(--ease)}
+.foot-links a:hover{color:var(--coral)}
+.foot-copy{font-size:.78rem;color:var(--muted);letter-spacing:.02em}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important}
+  .scroll-hint span{animation:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== 3D BACKGROUND ===================== -->
+<canvas id="bg-canvas"></canvas>
+<div id="progress"></div>
+<div id="cursor"></div>
+
+<!-- ===================== NAV ===================== -->
+<nav id="nav">
+  <a class="brand" href="#hero" aria-label="KindoLux home">
+    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M62 44H182L62 168V44Z" fill="#F8F5F4"/>
+      <path d="M110 194L110 122C129 122 147.4 129.6 160.9 143.1C174.4 156.6 182 174.9 182 194L110 194Z" fill="#FF6B5E"/>
+    </svg>
+    <span class="wm">Kindo<b>Lux</b></span>
+  </a>
+  <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div class="nav-links" id="navLinks">
+    <a href="#about">About</a>
+    <a href="#journey">Journey</a>
+    <a href="#soon">Launch</a>
+    <a href="#vault">Vault</a>
+    <a href="#soon" class="nav-cta">Notify Me</a>
+  </div>
+</nav>
+
+<main>
+  <!-- ===================== HERO ===================== -->
+  <section id="hero">
+    <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
+      <p class="hero-tag reveal in">KindoLux LLC — Wyoming, USA</p>
+      <h1 class="hero-wm reveal in d1">Kindo<b>Lux</b></h1>
+      <p class="hero-line reveal in d2">Curated Quality Goods</p>
+      <div class="hero-actions reveal in d3">
+        <a href="#soon" class="btn btn-primary no3d">Get Launch Updates →</a>
+        <a href="#about" class="btn btn-ghost no3d">Discover KindoLux</a>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">Scroll<span></span></div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section id="about">
+    <div class="wrap">
+      <p class="eyebrow reveal">Who we are</p>
+      <h2 class="reveal d1">Considered design,<br><em>dependable quality.</em></h2>
+      <p class="lead reveal d2">
+        KindoLux LLC is a US-registered e-commerce company based in Wyoming, curating quality
+        household and home products for customers across the United States. We're in our early
+        launch phase — building a brand defined by calm, modern shopping and goods that earn their
+        place in your home.
+      </p>
+      <div class="chips reveal d3">
+        <span class="chip"><i></i>Wyoming, USA</span>
+        <span class="chip"><i></i>E‑commerce</span>
+        <span class="chip"><i></i>Home &amp; Household</span>
+        <span class="chip"><i></i>Early Launch · 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== JOURNEY ===================== -->
+  <section id="journey">
+    <div class="wrap">
+      <p class="eyebrow reveal">The road to launch</p>
+      <h2 class="reveal d1">Our Amazon <em>journey.</em></h2>
+      <div class="timeline" id="timeline">
+        <div class="t-item done">
+          <div class="t-node"><i></i></div>
+          <div class="t-h">LLC Formed <span class="t-badge badge-done">Done</span></div>
+          <p class="t-desc">KindoLux LLC officially registered in the State of Wyoming.</p>
+        </div>
+        <div class="t-item done">
+          <div class="t-node"><i></i></div>
+          <div class="t-h">EIN Obtained <span class="t-badge badge-done">Done</span></div>
+          <p class="t-desc">Federal Employer Identification Number secured with the IRS.</p>
+        </div>
+        <div class="t-item done">
+          <div class="t-node"><i></i></div>
+          <div class="t-h">Brand Built <span class="t-badge badge-done">Done</span></div>
+          <p class="t-desc">Identity, voice, and product standards established across the board.</p>
+        </div>
+        <div class="t-item pending">
+          <div class="t-node"><i></i></div>
+          <div class="t-h">Amazon Launch <span class="t-badge badge-soon">Coming Soon</span></div>
+          <p class="t-desc">Our first curated collection goes live for US customers.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMING SOON ===================== -->
+  <section id="soon">
+    <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
+      <p class="eyebrow reveal">Almost there</p>
+      <h2 class="reveal d1">Our products are <em>launching soon.</em></h2>
+      <p class="lead reveal d2" style="text-align:center">
+        Be the first to know when the KindoLux collection goes live. No noise — just one note
+        when the doors open.
+      </p>
+      <div class="signup glass reveal d3" style="width:100%">
+        <strong style="font-family:var(--font-head);font-size:1.2rem;font-weight:500">Join the launch list</strong>
+        <!-- FORMSPREE: replace the action URL with your own form endpoint (https://formspree.io/f/XXXXXXXX) -->
+        <form action="https://formspree.io/f/your-form-id" method="POST">
+          <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address" />
+          <button type="submit" class="btn btn-primary no3d">Notify Me</button>
+        </form>
+        <p class="micro">We'll only email you about the KindoLux launch. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VAULT ===================== -->
+  <section id="vault">
+    <div class="wrap">
+      <p class="eyebrow reveal">Internal</p>
+      <h2 class="reveal d1">Supplier <em>Vault.</em></h2>
+      <p class="lead reveal d2">A private, password‑protected workspace for our curated supplier records.</p>
+      <div class="vault-card glass reveal d3">
+        <div class="lock-ico" id="lockIco">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>
+          </svg>
+        </div>
+        <strong style="font-family:var(--font-head);font-size:1.3rem;font-weight:500;display:block">Locked Supplier Vault</strong>
+        <p style="color:rgba(248,245,244,.66);margin-top:8px;font-weight:300">Authorized access only.</p>
+        <button class="btn btn-primary no3d" id="unlockBtn" style="margin-top:24px">🔒 Unlock Vault</button>
+        <p class="vault-msg" id="vaultMsg" role="status"></p>
+
+        <div class="vault-table-wrap" id="vaultTable">
+          <table>
+            <thead><tr><th>Supplier</th><th>Product</th><th>Contact</th><th>Notes</th></tr></thead>
+            <tbody id="vaultBody">
+              <tr class="empty-state"><td colspan="4">No suppliers added yet — records will appear here.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer id="footer">
+  <div class="foot-brand">
+    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M62 44H182L62 168V44Z" fill="#F8F5F4"/>
+      <path d="M110 194L110 122C129 122 147.4 129.6 160.9 143.1C174.4 156.6 182 174.9 182 194L110 194Z" fill="#FF6B5E"/>
+    </svg>
+    <span class="wm">Kindo<b>Lux</b></span>
+  </div>
+  <p class="foot-tag">Curated Quality Goods</p>
+  <div class="foot-links">
+    <a href="mailto:hello@kindolux.com">hello@kindolux.com</a>
+    <a href="#about">About</a>
+    <a href="#journey">Journey</a>
+    <a href="#soon">Launch</a>
+  </div>
+  <p class="foot-copy">© <span id="year"></span> KindoLux LLC · Wyoming, USA · All rights reserved.</p>
+</footer>
+
+<!-- ===================== THREE.JS (CDN r128) ===================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===========================================================================
+   KindoLux — interactive 3D scene
+   =========================================================================== */
+(function(){
+  'use strict';
+
+  // ---------- helpers ----------
+  const lerp = (a,b,t)=>a+(b-a)*t;
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const isMobile = window.matchMedia('(max-width:760px)').matches ||
+                   ('ontouchstart' in window && navigator.maxTouchPoints>0);
+
+  const COL = { graphite:0x322f35, coral:0xff6b5e, paper:0xf8f5f4, ink:0x1c1a1e };
+
+  function hasWebGL(){
+    try{ const c=document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }
+    catch(e){ return false; }
+  }
+
+  const canvas = document.getElementById('bg-canvas');
+  let renderer, scene, camera, clock;
+  let sculpt, particles, basePositions, grid, ptLight;
+  const interactives = [];
+  const raycaster = new THREE.Raycaster();
+
+  // input state
+  const pointer = new THREE.Vector2(-2,-2);
+  const mouse = {x:0,y:0}, mouseTarget = {x:0,y:0};
+  let hovered = null;
+
+  // drag-to-rotate
+  let dragging=false, lastX=0, lastY=0;
+  let manualY=0, manualX=0, velY=0, velX=0, autoY=0;
+
+  // scroll choreography
+  const SECTIONS = ['hero','about','journey','soon','vault','footer'];
+  const PRESET = {
+    hero:    {cam:[0,0,6.2],   pos:[0,0,0],       scale:1.25},
+    about:   {cam:[1.3,0.1,6], pos:[2.45,0.1,-0.5],scale:0.95},
+    journey: {cam:[-1.2,-.2,6.2],pos:[-2.6,0.25,-.9],scale:0.85},
+    soon:    {cam:[0,0.2,5.6], pos:[0,0.45,-1.3],  scale:0.80},
+    vault:   {cam:[1.1,0,6],   pos:[2.6,-.2,-1.0], scale:0.80},
+    footer:  {cam:[0,0.3,6.4], pos:[0,0.7,-1.6],   scale:0.70}
+  };
+  const cur = {camX:0,camY:0,camZ:6.2, sx:0,sy:0,sz:0, scale:1.25};
+  let target = PRESET.hero;
+
+  function init3D(){
+    renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile?1.5:2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(COL.ink, 0.072);
+
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0,0,6.2);
+
+    clock = new THREE.Clock();
+
+    // ---------- lights ----------
+    scene.add(new THREE.AmbientLight(COL.paper, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(4,6,5); scene.add(key);
+    ptLight = new THREE.PointLight(COL.coral, 1.7, 22); ptLight.position.set(-2,1.5,3); scene.add(ptLight);
+    const fill = new THREE.PointLight(COL.paper, 0.5, 24); fill.position.set(3,-2,2); scene.add(fill);
+
+    buildSculpture();
+    buildParticles();
+    buildGrid();
+    buildInteractives();
+
+    bindEvents();
+    onResize();
+    animate();
+  }
+
+  // ---------- central sculpture (echoes the brand: graphite mass + coral arc) ----------
+  function buildSculpture(){
+    sculpt = new THREE.Group();
+
+    const coreGeo = new THREE.IcosahedronGeometry(1.15, 0);
+    const coreMat = new THREE.MeshStandardMaterial({color:COL.graphite, metalness:.35, roughness:.42, flatShading:true});
+    sculpt.add(new THREE.Mesh(coreGeo, coreMat));
+
+    const shellGeo = new THREE.IcosahedronGeometry(1.32, 1);
+    const shellMat = new THREE.MeshBasicMaterial({color:COL.paper, wireframe:true, transparent:true, opacity:.10});
+    sculpt.add(new THREE.Mesh(shellGeo, shellMat));
+
+    const ringGeo = new THREE.TorusGeometry(1.95, 0.045, 16, 120);
+    const ringMat = new THREE.MeshStandardMaterial({color:COL.coral, emissive:COL.coral, emissiveIntensity:.55, metalness:.3, roughness:.4});
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.set(Math.PI/2.3, 0.4, 0);
+    sculpt.add(ring);
+
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.02, 12, 100),
+      new THREE.MeshStandardMaterial({color:COL.paper, transparent:true, opacity:.5, metalness:.2, roughness:.6}));
+    ring2.rotation.set(0.6, 1.1, 0.3);
+    sculpt.add(ring2);
+
+    const tetra = new THREE.Mesh(new THREE.TetrahedronGeometry(0.42),
+      new THREE.MeshStandardMaterial({color:COL.coral, emissive:COL.coral, emissiveIntensity:.4, flatShading:true, metalness:.2, roughness:.4}));
+    tetra.position.set(0.9,0.9,0.6);
+    sculpt.userData.tetra = tetra;
+    sculpt.add(tetra);
+
+    scene.add(sculpt);
+  }
+
+  // ---------- mouse-reactive particle field ----------
+  function buildParticles(){
+    const count = isMobile ? 900 : 2600;
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count*3);
+    for(let i=0;i<count;i++){
+      const r = 6 + Math.random()*9;
+      const th = Math.random()*Math.PI*2;
+      const ph = Math.acos(2*Math.random()-1);
+      pos[i*3]   = Math.sin(ph)*Math.cos(th)*r * (0.6+Math.random()*0.7);
+      pos[i*3+1] = (Math.random()-0.5)*14;
+      pos[i*3+2] = Math.sin(ph)*Math.sin(th)*r * (0.5+Math.random()*0.6) - 3;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    basePositions = pos.slice(0);
+
+    const mat = new THREE.PointsMaterial({
+      color:COL.coral, size:isMobile?0.045:0.04, sizeAttenuation:true,
+      transparent:true, opacity:.75, depthWrite:false, blending:THREE.AdditiveBlending
+    });
+    particles = new THREE.Points(geo, mat);
+    scene.add(particles);
+  }
+
+  // ---------- receding grid floor ----------
+  function buildGrid(){
+    grid = new THREE.GridHelper(36, 36, COL.coral, COL.graphite);
+    grid.material.transparent = true;
+    grid.material.opacity = 0.14;
+    grid.position.y = -4.2;
+    scene.add(grid);
+  }
+
+  // ---------- clickable floating elements ----------
+  function buildInteractives(){
+    const geos = [
+      new THREE.OctahedronGeometry(0.34),
+      new THREE.TetrahedronGeometry(0.36),
+      new THREE.BoxGeometry(0.42,0.42,0.42),
+      new THREE.DodecahedronGeometry(0.32),
+      new THREE.IcosahedronGeometry(0.34,0)
+    ];
+    const spots = [
+      [-3.4, 1.8,-1], [3.6,-1.4,-1.5], [-2.8,-2.0,-0.5], [3.0,2.2,-2], [-4.0,-0.3,-2.5]
+    ];
+    const cyc = [COL.coral, COL.paper, COL.graphite, 0xffb3aa];
+    for(let i=0;i<geos.length;i++){
+      const mat = new THREE.MeshStandardMaterial({color:COL.coral, emissive:COL.coral, emissiveIntensity:.15, metalness:.3, roughness:.4, flatShading:true});
+      const m = new THREE.Mesh(geos[i], mat);
+      m.position.set(spots[i][0],spots[i][1],spots[i][2]);
+      m.userData = {baseY:spots[i][1], baseScale:1, phase:Math.random()*6.28, spd:0.5+Math.random()*0.6,
+                    pulse:0, colorIdx:0, palette:cyc};
+      interactives.push(m);
+      scene.add(m);
+    }
+  }
+
+  // ---------- interaction events ----------
+  function bindEvents(){
+    window.addEventListener('pointermove', onPointerMove, {passive:true});
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('click', onClick);
+    window.addEventListener('resize', debounce(onResize, 150));
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  }
+
+  function isUI(t){ return t && t.closest && t.closest('a,button,input,form,.no3d'); }
+
+  function onPointerMove(e){
+    pointer.x = (e.clientX/window.innerWidth)*2 - 1;
+    pointer.y = -(e.clientY/window.innerHeight)*2 + 1;
+    mouseTarget.x = pointer.x; mouseTarget.y = pointer.y;
+
+    const cc = document.getElementById('cursor');
+    if(cc){ cc.style.left=e.clientX+'px'; cc.style.top=e.clientY+'px'; }
+
+    if(dragging){
+      const dx = e.clientX-lastX, dy = e.clientY-lastY;
+      manualY += dx*0.006; manualX += dy*0.006;
+      velY = dx*0.006; velX = dy*0.006;
+      lastX=e.clientX; lastY=e.clientY;
+    }
+  }
+  function onPointerDown(e){
+    if(isUI(e.target)) return;
+    dragging=true; lastX=e.clientX; lastY=e.clientY; velY=0; velX=0;
+  }
+  function onPointerUp(){ dragging=false; }
+
+  function onClick(e){
+    if(isUI(e.target)) return;
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(interactives)[0];
+    if(hit){
+      const o = hit.object, u = o.userData;
+      u.pulse = 1;
+      u.colorIdx = (u.colorIdx+1) % u.palette.length;
+      const c = u.palette[u.colorIdx];
+      o.material.color.setHex(c);
+      o.material.emissive.setHex(c);
+    }
+  }
+
+  function onScroll(){
+    const sc = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('progress').style.width = (max>0? clamp(sc/max,0,1):0)*100 + '%';
+
+    const mid = window.innerHeight*0.5;
+    let active = 'hero';
+    for(const id of SECTIONS){
+      const el = document.getElementById(id); if(!el) continue;
+      const r = el.getBoundingClientRect();
+      if(r.top <= mid && r.bottom >= mid){ active = id; break; }
+    }
+    target = PRESET[active] || PRESET.hero;
+
+    document.getElementById('nav').classList.toggle('scrolled', sc>40);
+  }
+
+  function onResize(){
+    if(!renderer) return;
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile?1.5:2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  // ---------- render loop ----------
+  const planeZ = new THREE.Plane(new THREE.Vector3(0,0,1), 0);
+  const ptrWorld = new THREE.Vector3();
+
+  function animate(){
+    requestAnimationFrame(animate);
+    if(document.hidden) return;
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t  = clock.elapsedTime;
+
+    mouse.x = lerp(mouse.x, mouseTarget.x, 0.06);
+    mouse.y = lerp(mouse.y, mouseTarget.y, 0.06);
+
+    cur.camX = lerp(cur.camX, target.cam[0], 0.05);
+    cur.camY = lerp(cur.camY, target.cam[1], 0.05);
+    cur.camZ = lerp(cur.camZ, target.cam[2], 0.05);
+    cur.sx   = lerp(cur.sx,   target.pos[0], 0.05);
+    cur.sy   = lerp(cur.sy,   target.pos[1], 0.05);
+    cur.sz   = lerp(cur.sz,   target.pos[2], 0.05);
+    cur.scale= lerp(cur.scale,target.scale,  0.05);
+
+    camera.position.set(cur.camX + mouse.x*0.5, cur.camY + mouse.y*0.35, cur.camZ);
+    camera.lookAt(cur.sx*0.25, cur.sy*0.25, 0);
+
+    sculpt.position.set(cur.sx, cur.sy, cur.sz);
+    sculpt.scale.setScalar(cur.scale);
+
+    autoY += dt * (reduceMotion?0.03:0.12);
+    if(!dragging){ manualY += velY; manualX += velX; velY*=0.95; velX*=0.95; }
+    manualX = clamp(manualX, -1.1, 1.1);
+    sculpt.rotation.y = autoY + manualY;
+    sculpt.rotation.x = lerp(sculpt.rotation.x, mouse.y*0.4 + manualX, 0.06);
+
+    if(sculpt.userData.tetra){
+      const te=sculpt.userData.tetra; te.rotation.y+=dt*0.8; te.rotation.x+=dt*0.5;
+    }
+    ptLight.position.x = lerp(ptLight.position.x, -2 + mouse.x*2, 0.05);
+    ptLight.position.y = lerp(ptLight.position.y, 1.5 + mouse.y*2, 0.05);
+
+    raycaster.setFromCamera(pointer, camera);
+    const hit = dragging ? null : raycaster.intersectObjects(interactives)[0];
+    const newHover = hit ? hit.object : null;
+    if(newHover !== hovered){
+      hovered = newHover;
+      document.getElementById('cursor')?.classList.toggle('hot', !!hovered);
+    }
+    for(const o of interactives){
+      const u=o.userData;
+      o.position.y = u.baseY + Math.sin(t*u.spd + u.phase)*0.32;
+      o.rotation.x += dt*0.4; o.rotation.y += dt*0.3;
+      u.pulse *= 0.92;
+      const want = u.baseScale * (o===hovered?1.55:1) * (1 + u.pulse*0.9);
+      const s = lerp(o.scale.x, want, 0.18); o.scale.setScalar(s);
+      o.material.emissiveIntensity = lerp(o.material.emissiveIntensity, (o===hovered?0.85:0.15)+u.pulse, 0.15);
+    }
+
+    particles.rotation.y += dt*0.012;
+    particles.position.x = lerp(particles.position.x, mouse.x*0.4, 0.04);
+    particles.position.y = lerp(particles.position.y, mouse.y*0.4, 0.04);
+
+    if(!isMobile && !reduceMotion){
+      raycaster.ray.intersectPlane(planeZ, ptrWorld);
+      if(ptrWorld){
+        const arr = particles.geometry.attributes.position.array;
+        const R2 = 2.6*2.6;
+        for(let i=0;i<arr.length;i+=3){
+          arr[i]   += (basePositions[i]  -arr[i])  *0.05;
+          arr[i+1] += (basePositions[i+1]-arr[i+1])*0.05;
+          const dx=arr[i]-ptrWorld.x, dy=arr[i+1]-ptrWorld.y;
+          const d2=dx*dx+dy*dy;
+          if(d2<R2){ const f=(1-d2/R2)*0.5; arr[i]+=dx*f; arr[i+1]+=dy*f; }
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+      }
+    }
+
+    grid.position.x = lerp(grid.position.x, mouse.x*0.6, 0.03);
+
+    renderer.render(scene, camera);
+  }
+
+  function debounce(fn,ms){ let id; return function(){ clearTimeout(id); id=setTimeout(fn,ms); }; }
+
+  window.addEventListener('beforeunload', function(){
+    if(!scene) return;
+    scene.traverse(function(o){
+      if(o.geometry) o.geometry.dispose();
+      if(o.material){ (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose()); }
+    });
+    if(renderer) renderer.dispose();
+  });
+
+  // ===================== boot 3D =====================
+  if(hasWebGL()){
+    try{ init3D(); }
+    catch(err){ console.warn('3D disabled:', err); canvas.style.display='none'; }
+  } else { canvas.style.display='none'; }
+
+  /* =========================================================================
+     UI / DOM behavior
+     ========================================================================= */
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', ()=>{
+    const open = navLinks.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+    navLinks.classList.remove('open'); menuBtn.setAttribute('aria-expanded', false);
+  }));
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.18});
+  document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+
+  const tl = document.getElementById('timeline');
+  const tlItems = document.querySelectorAll('.t-item');
+  const tio = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        tl.classList.add('in');
+        tlItems.forEach((it,i)=> setTimeout(()=>it.classList.add('in'), i*180));
+        tio.disconnect();
+      }
+    });
+  }, {threshold:0.25});
+  if(tl) tio.observe(tl);
+
+  // ===================== VAULT =====================
+  const VAULT_PASSWORD = 'kindolux2026'; // placeholder — change before going live
+  const unlockBtn = document.getElementById('unlockBtn');
+  const vaultMsg  = document.getElementById('vaultMsg');
+  const vaultTable= document.getElementById('vaultTable');
+  let vaultOpen = false;
+
+  unlockBtn.addEventListener('click', ()=>{
+    if(vaultOpen){
+      vaultOpen=false; vaultTable.classList.remove('show');
+      vaultMsg.textContent=''; vaultMsg.className='vault-msg';
+      unlockBtn.textContent='🔒 Unlock Vault';
+      return;
+    }
+    const entry = window.prompt('Enter the Supplier Vault password:');
+    if(entry === null) return;
+    if(entry === VAULT_PASSWORD){
+      vaultOpen=true;
+      vaultTable.classList.add('show');
+      vaultMsg.textContent='Access granted — welcome back.';
+      vaultMsg.className='vault-msg ok';
+      unlockBtn.textContent='🔓 Lock Vault';
+    } else {
+      vaultMsg.textContent='Incorrect password. Access denied.';
+      vaultMsg.className='vault-msg err';
+      vaultTable.classList.remove('show');
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
